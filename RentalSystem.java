@@ -48,7 +48,7 @@ public class RentalSystem {
     public boolean addCustomer(Customer customer) {
     	for (Customer c : customers)
     	{
-    		if (c.getCustomerId() == c.getCustomerId())
+    		if (c.getCustomerId() == customer.getCustomerId())
     		{
     		System.out.println("Error: Duplicate Customer ID");	
     		return false;
