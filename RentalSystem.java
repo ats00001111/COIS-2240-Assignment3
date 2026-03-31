@@ -246,7 +246,7 @@ public class RentalSystem {
 				{
 					if (v.length == 9)
 					{
-						if (v[8].contains("Yes") || v[8].contains("Nn"))
+						if (v[8].contains("Yes") || v[8].contains("No"))
 						{
 							Vehicle temp = new Minibus(v[2],v[3],Integer.parseInt(v[4]),Boolean.parseBoolean(v[8]));
 							temp.setLicensePlate(v[1]);
