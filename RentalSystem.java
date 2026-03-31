@@ -4,15 +4,19 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
+import java.time.LocalDate;
 import java.io.IOException;
 
 public class RentalSystem {
 	//private static instance
 	private static RentalSystem instance;
 	//private constructor
-	private RentalSystem() {}
+	private RentalSystem() { loadData(); }
 	//public accessor method
 	public static RentalSystem getInstance()
 	{
@@ -205,6 +209,107 @@ public class RentalSystem {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-    	
+    }
+    private void loadData()
+    {
+    	try {
+			BufferedReader readVehicles = new BufferedReader(new FileReader("vehicles.txt"));
+			String line;
+			while((line = readVehicles.readLine()) != null)
+			{
+				String[] v = line.split("[:|]");
+				for(int i=0; i<v.length; i++)
+				{
+					v[i] = v[i].trim();
+				}
+				if (v.length > 1)
+				{
+					if (v.length == 9)
+					{
+						if (v[8].contains("Yes") || v[8].contains("Nn"))
+						{
+							Vehicle temp = new Minibus(v[2],v[3],Integer.parseInt(v[4]),Boolean.parseBoolean(v[8]));
+							temp.setLicensePlate(v[1]);
+							if (v[5].contains("Rented"))
+								temp.setStatus(Vehicle.VehicleStatus.Rented);
+							vehicles.add(temp);
+						}
+						else
+						{
+						Vehicle temp = new Car(v[2],v[3],Integer.parseInt(v[4]),Integer.parseInt(v[8]));
+						temp.setLicensePlate(v[1]);
+						if (v[5].contains("Rented"))
+							temp.setStatus(Vehicle.VehicleStatus.Rented);
+						vehicles.add(temp);
+						}
+					}
+					else
+					{
+						Vehicle temp = new PickupTruck(v[2],v[3],Integer.parseInt(v[4]),Double.parseDouble(v[8]),Boolean.parseBoolean(v[10]));
+						temp.setLicensePlate(v[1]);
+						if (v[5].contains("Rented"))
+							temp.setStatus(Vehicle.VehicleStatus.Rented);
+						vehicles.add(temp);
+					}
+				}
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+    	try {
+			BufferedReader readCustomers = new BufferedReader(new FileReader("customers.txt"));
+			String line;
+			while((line = readCustomers.readLine()) != null)
+			{
+				String[] c = line.split("[:|]");
+				for (int i=0; i<c.length; i++)
+				{
+					c[i] = c[i].trim();
+				}
+				if (c.length > 1)
+				customers.add(new Customer(Integer.parseInt(c[1]),c[3]));
+			}
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    		try {
+				BufferedReader readRecords = new BufferedReader(new FileReader("rental_records.txt"));
+				String line;
+				while((line = readRecords.readLine()) != null) 
+				{
+					String[] r = line.split("[:|]");
+					for (int i=0; i<r.length; i++)
+					{
+						r[i] = r[i].trim();
+					}
+					if (r.length > 1)
+					{
+					Vehicle temp = findVehicleByPlate(r[2]);
+					Customer TempCustomer = null;
+					for(Customer c : customers)
+					{
+						if (c.getCustomerName().contains(r[4]))
+						{
+							TempCustomer = findCustomerById(c.getCustomerId());
+						}
+					}
+					rentalHistory.addRecord(new RentalRecord(temp, TempCustomer, LocalDate.parse(r[6]), Double.parseDouble(r[8].replace("$", "")), r[0]));
+					}
+				}
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
     }
 }
