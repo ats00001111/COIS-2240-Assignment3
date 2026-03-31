@@ -1,6 +1,12 @@
 import java.util.List;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class RentalSystem {
 	//private static instance
@@ -22,17 +28,36 @@ public class RentalSystem {
 
     public void addVehicle(Vehicle vehicle) {
         vehicles.add(vehicle);
+        saveVehicle(vehicle);
     }
 
     public void addCustomer(Customer customer) {
         customers.add(customer);
+        saveCustomer(customer);
     }
 
     public void rentVehicle(Vehicle vehicle, Customer customer, LocalDate date, double amount) {
         if (vehicle.getStatus() == Vehicle.VehicleStatus.Available) {
             vehicle.setStatus(Vehicle.VehicleStatus.Rented);
-            rentalHistory.addRecord(new RentalRecord(vehicle, customer, date, amount, "RENT"));
+            RentalRecord rented = new RentalRecord(vehicle, customer, date, amount, "RENT");
+            rentalHistory.addRecord(rented);
             System.out.println("Vehicle rented to " + customer.getCustomerName());
+            saveRecord(rented);
+            Path filePath = Paths.get("vehicles.txt");
+            try {
+                List<String> lines = Files.readAllLines(filePath);
+                for (int i = 0; i < lines.size(); i++) {
+                    if (lines.get(i).contains(vehicle.getLicensePlate()))
+                    {
+                    	lines.set(i, lines.get(i).replace("Available", "Rented"));
+                    }
+                }
+                Files.write(filePath, lines);
+            } 
+            catch(IOException e)
+            {
+            	e.printStackTrace();
+            }
         }
         else {
             System.out.println("Vehicle is not available for renting.");
@@ -42,8 +67,25 @@ public class RentalSystem {
     public void returnVehicle(Vehicle vehicle, Customer customer, LocalDate date, double extraFees) {
         if (vehicle.getStatus() == Vehicle.VehicleStatus.Rented) {
             vehicle.setStatus(Vehicle.VehicleStatus.Available);
-            rentalHistory.addRecord(new RentalRecord(vehicle, customer, date, extraFees, "RETURN"));
+            RentalRecord returned = new RentalRecord(vehicle, customer, date, extraFees, "RETURN");
+            rentalHistory.addRecord(returned);
             System.out.println("Vehicle returned by " + customer.getCustomerName());
+            saveRecord(returned);
+            Path filePath = Paths.get("vehicles.txt");
+            try {
+                List<String> lines = Files.readAllLines(filePath);
+                for (int i = 0; i < lines.size(); i++) {
+                    if (lines.get(i).contains(vehicle.getLicensePlate()))
+                    {
+                    	lines.set(i, lines.get(i).replace("Rented", "Available"));
+                    }
+                }
+                Files.write(filePath, lines);
+            } 
+            catch(IOException e)
+            {
+            	e.printStackTrace();
+            }
         }
         else {
             System.out.println("Vehicle is not rented.");
@@ -133,5 +175,36 @@ public class RentalSystem {
             if (c.getCustomerId() == id)
                 return c;
         return null;
+    }
+    
+    public void saveVehicle(Vehicle vehicle)
+    {
+    	try (BufferedWriter vehicleWriter = new BufferedWriter(new FileWriter("vehicles.txt", true)))
+    	{
+			vehicleWriter.write(vehicle.getInfo() + "\n");
+			vehicleWriter.close();
+		} 
+    	catch (IOException e) {
+			e.printStackTrace();
+		}
+    }
+    public void saveCustomer(Customer customer)
+    {
+    	try (BufferedWriter customerWriter = new BufferedWriter(new FileWriter("customers.txt", true))){
+			customerWriter.write(customer.toString() + "\n");
+			customerWriter.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+    }
+    public void saveRecord(RentalRecord record)
+    {
+    	try (BufferedWriter recordWriter = new BufferedWriter(new FileWriter("rental_records.txt", true))){
+			recordWriter.write(record.toString() + "\n");
+			recordWriter.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+    	
     }
 }
