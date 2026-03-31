@@ -30,14 +30,34 @@ public class RentalSystem {
     private List<Customer> customers = new ArrayList<>();
     private RentalHistory rentalHistory = new RentalHistory();
 
-    public void addVehicle(Vehicle vehicle) {
+    public boolean addVehicle(Vehicle vehicle) {
+    	for (Vehicle v : vehicles)
+    	{
+    		if (v.getLicensePlate().contains(vehicle.getLicensePlate()))
+    		{
+    		System.out.println("Error: Duplicate license plate");	
+    		return false;
+    		}
+    	}
+    	System.out.println("Vehicle added successfully.");
         vehicles.add(vehicle);
         saveVehicle(vehicle);
+        return true;
     }
 
-    public void addCustomer(Customer customer) {
+    public boolean addCustomer(Customer customer) {
+    	for (Customer c : customers)
+    	{
+    		if (c.getCustomerId() == c.getCustomerId())
+    		{
+    		System.out.println("Error: Duplicate license plate");	
+    		return false;
+    		}
+    	}
+    	System.out.println("Customer added successfully.");
         customers.add(customer);
         saveCustomer(customer);
+        return true;
     }
 
     public void rentVehicle(Vehicle vehicle, Customer customer, LocalDate date, double amount) {
