@@ -50,7 +50,7 @@ public class RentalSystem {
     	{
     		if (c.getCustomerId() == c.getCustomerId())
     		{
-    		System.out.println("Error: Duplicate license plate");	
+    		System.out.println("Error: Duplicate Customer ID");	
     		return false;
     		}
     	}
