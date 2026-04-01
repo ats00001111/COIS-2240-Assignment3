@@ -56,7 +56,13 @@ public class VehicleRentalApp {
 		            }
                     
                     if (vehicle != null){
+                    	try
+                    	{
 	                    vehicle.setLicensePlate(plate);
+                    	} catch(NullPointerException e)
+                    	{
+                    		e.printStackTrace();
+                    	}
 	                    rentalSystem.addVehicle(vehicle);
                     }
                     else {
