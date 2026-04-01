@@ -8,6 +8,8 @@ import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Modifier;
 
 class VehicleRentalTest
 {
@@ -48,5 +50,19 @@ class VehicleRentalTest
 		assertTrue(rentalSystem.returnVehicle(v1, c1, LocalDate.now(), 0));
 		Assertions.assertEquals(Vehicle.VehicleStatus.Available, v1.getStatus());
 		assertFalse(rentalSystem.returnVehicle(v1, c1, LocalDate.now(), 0));
+	}
+	@Test
+	public void testSingletonRentalSystem()
+	{
+		int i = 0;
+		try {
+			Constructor<RentalSystem> constructor = RentalSystem.class.getDeclaredConstructor();
+			i = constructor.getModifiers();
+		} catch (NoSuchMethodException | SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Assertions.assertEquals(Modifier.PRIVATE, i);
+		assertFalse(RentalSystem.getInstance() == null);
 	}
 }
