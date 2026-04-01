@@ -1,8 +1,12 @@
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 class VehicleRentalTest
@@ -29,5 +33,20 @@ class VehicleRentalTest
 				assertEquals("Invalid license plate", e.getMessage());
 			}
 		}
+	}
+	@Test
+	public void testRentandReturnVehicle()
+	{
+		Vehicle v1 = new Car("","",0,0);
+		v1.setLicensePlate("ABC123");
+		Customer c1 = new Customer(0,"");
+		Assertions.assertEquals(Vehicle.VehicleStatus.Available, v1.getStatus());
+		RentalSystem rentalSystem = RentalSystem.getInstance();
+		assertTrue(rentalSystem.rentVehicle(v1, c1, LocalDate.now(), 0));
+		Assertions.assertEquals(Vehicle.VehicleStatus.Rented, v1.getStatus());
+		assertFalse(rentalSystem.rentVehicle(v1, c1, LocalDate.now(), 0));
+		assertTrue(rentalSystem.returnVehicle(v1, c1, LocalDate.now(), 0));
+		Assertions.assertEquals(Vehicle.VehicleStatus.Available, v1.getStatus());
+		assertFalse(rentalSystem.returnVehicle(v1, c1, LocalDate.now(), 0));
 	}
 }
